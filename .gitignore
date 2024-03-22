@@ -1,4 +1,6 @@
 /ros1/*
 /ros2/*
 
+.ros2_mode
+
 !.gitkeep
