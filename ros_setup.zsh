@@ -10,7 +10,7 @@ else
   MODE="ros1"
 fi
 
-echo "Current ROS mode is $MODE"
+echo "Current ROS version is $MODE"
 
 
 if [[ "$MODE" == "ros1" ]]; then
@@ -35,18 +35,18 @@ elif [[ "$MODE" == "ros2" ]]; then
 fi
 
 function swros() {
-  if [[ "$1" == "ros1" ]]; then
+  if [[ "$1" == "1" ]]; then
     if [ -f $SCRIPT_DIR/$MODE_FILE ]; then
       command rm $SCRIPT_DIR/$MODE_FILE
       MODE=$1
     fi
-  elif [[ "$1" == "ros2" ]]; then
+  elif [[ "$1" == "2" ]]; then
     if [ ! -f $SCRIPT_DIR/$MODE_FILE ]; then
       command echo -n > $SCRIPT_DIR/$MODE_FILE
       MODE=$1
     fi
   else
-    echo "ros1 or ros2?"
+    echo "1 or 2?"
     return
   fi
   source ~/.zshrc
@@ -55,3 +55,4 @@ function swros() {
 alias rd_run="sh $SCRIPT_DIR/docker/$MODE/run.sh"
 alias rd_build="sh $SCRIPT_DIR/docker/$MODE/build.sh"
 alias rd_exec="sh $SCRIPT_DIR/docker/$MODE/exec.sh"
+
