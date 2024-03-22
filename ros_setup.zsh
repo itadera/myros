@@ -1,3 +1,6 @@
+DIST_ros1="noetic"
+DIST_ros2="humble"
+
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 MODE_FILE=".ros2_mode"
 
@@ -9,15 +12,15 @@ fi
 
 echo "Current ROS mode is $MODE"
 
+
 if [[ "$MODE" == "ros1" ]]; then
-  source /opt/ros/noetic/setup.zsh
+  source /opt/ros/$DIST_ros1/setup.zsh
   sws=(`ls -1 $SCRIPT_DIR/ros1/`)
   for sw_name in "${sws[@]}"; do
     source $SCRIPT_DIR/ros1/${sw_name}/devel/setup.zsh --extended
   done
 elif [[ "$MODE" == "ros2" ]]; then
-  # source /opt/ros/foxy/setup.zsh
-  source /opt/ros/humble/setup.zsh
+  source /opt/ros/$DIST_ros2/setup.zsh
   sws=(`ls -1 $SCRIPT_DIR/ros2/`)
   for sw_name in "${sws[@]}"; do
     source $SCRIPT_DIR/ros2/${sw_name}/install/setup.zsh --extended
@@ -47,4 +50,6 @@ function swros() {
   source ~/.zshrc
 }
 
-
+alias rd_run="sh $SCRIPT_DIR/docker/$MODE/run.sh"
+alias rd_build="sh $SCRIPT_DIR/docker/$MODE/build.sh"
+alias rd_exec="sh $SCRIPT_DIR/docker/$MODE/exec.sh"

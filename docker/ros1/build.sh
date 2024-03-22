@@ -13,4 +13,5 @@ abs_dirname() {
 }
 
 SCRIPT_DIR="$(abs_dirname "$0")"
-docker build -f $SCRIPT_DIR/Dockerfile -t mynoetic . 
+IMAGE_NAME="mynoetic"
+docker build -f $SCRIPT_DIR/Dockerfile -t $IMAGE_NAME . 
