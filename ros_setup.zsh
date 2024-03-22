@@ -19,6 +19,7 @@ if [[ "$MODE" == "ros1" ]]; then
   for sw_name in "${sws[@]}"; do
     source $SCRIPT_DIR/ros1/${sw_name}/devel/setup.zsh --extended
   done
+  cd $SCRIPT_DIR/ros1
 elif [[ "$MODE" == "ros2" ]]; then
   source /opt/ros/$DIST_ros2/setup.zsh
   sws=(`ls -1 $SCRIPT_DIR/ros2/`)
@@ -30,6 +31,7 @@ elif [[ "$MODE" == "ros2" ]]; then
   eval "$(register-python-argcomplete3 ros2)"
   eval "$(register-python-argcomplete3 colcon)"
 
+  cd $SCRIPT_DIR/ros2
 fi
 
 function swros() {
