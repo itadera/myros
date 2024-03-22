@@ -3,7 +3,10 @@ FROM osrf/ros:noetic-desktop-full
 ENV CATKIN_WS="/root/catkin_ws"
 SHELL ["/bin/bash", "-c"]
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y git nano zsh && rosdep update
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN sed -i.bak -e "s%http://archive.ubuntu.com/ubuntu/%http://ftp.jaist.ac.jp/pub/Linux/ubuntu/%g" /etc/apt/sources.list
+RUN apt-get update && apt-get upgrade -y && apt-get install -y git nano zsh terminator && rosdep update
 RUN mkdir -p $CATKIN_WS/src
 
 WORKDIR  $CATKIN_WS/src
