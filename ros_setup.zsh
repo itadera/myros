@@ -39,18 +39,18 @@ elif [[ "$MODE" == "ros2" ]]; then
 fi
 
 function swros() {
-  if [[ "$1" == "1" ]]; then
+  if [[ "$1" == "ros1" ]]; then
     if [ -f $SCRIPT_DIR/$MODE_FILE ]; then
       command rm $SCRIPT_DIR/$MODE_FILE
       MODE=$1
     fi
-  elif [[ "$1" == "2" ]]; then
+  elif [[ "$1" == "ros2" ]]; then
     if [ ! -f $SCRIPT_DIR/$MODE_FILE ]; then
       command echo -n > $SCRIPT_DIR/$MODE_FILE
       MODE=$1
     fi
   else
-    echo "1 or 2?"
+    echo "ros1 or ros2?"
     return
   fi
   source ~/.zshrc
@@ -60,3 +60,53 @@ alias rd_run="sh $SCRIPT_DIR/docker/$MODE/run.sh"
 alias rd_build="sh $SCRIPT_DIR/docker/$MODE/build.sh"
 alias rd_exec="sh $SCRIPT_DIR/docker/$MODE/exec.sh"
 
+function myros() {
+  if [[ "$1" == "sw" ]]; then
+    swros $2
+  elif [[ "$1" == "docker" ]]; then
+    if [[ "$2" == "run" ]]; then
+      rd_run
+    elif [[ "$2" == "build" ]]; then
+      rd_build
+    elif [[ "$2" == "exec" ]]; then
+      rd_exec
+    else
+      echo "run, build or exec?"
+      return
+    fi
+  else
+    echo "Current ROS version is $MODE"
+    echo "sw or docker?"
+    return
+  fi
+}
+
+function _myros () {
+  local -a val
+  val=(sw docker)
+
+  local -a val_sw
+  val_sw=(ros1 ros2)
+
+  local -a val_docker
+  val_docker=(run build exec)
+
+  _arguments '1: :->arg1' '2: :->arg2'
+
+  case "$state" in
+    arg1)
+      _values $state $val
+      ;;
+    arg2)
+      if [[ $words[2] == "sw" ]]; then
+        _values $state $val_sw
+      elif [[ $words[2] == "docker" ]]; then
+        _values $state $val_docker
+      fi
+      ;;
+  esac
+}
+
+compdef _myros myros
+
+# zstyle ':completion:*' format '%B%d%b'
