@@ -13,29 +13,48 @@ fi
 echo "Current ROS version is $MODE"
 
 
-if [[ "$MODE" == "ros1" ]]; then
-  if [ -e opt/ros/$DIST_ros1/setup.zsh ]; then
+function source_ros1() {
+  if [ -e /opt/ros/$DIST_ros1/setup.zsh ]; then
     source /opt/ros/$DIST_ros1/setup.zsh
   fi
+
   sws=(`ls -1 $SCRIPT_DIR/ros1/`)
   for sw_name in "${sws[@]}"; do
     source $SCRIPT_DIR/ros1/${sw_name}/devel/setup.zsh --extended
   done
+
   cd $SCRIPT_DIR/ros1
-elif [[ "$MODE" == "ros2" ]]; then
-  if [ -e opt/ros/$DIST_ros2/setup.zsh ]; then
+}
+
+function source_ros2() {
+  if [ -e /opt/ros/$DIST_ros2/setup.zsh ]; then
     source /opt/ros/$DIST_ros2/setup.zsh
+
+    # argcomplete for ros2 & colcon
+    eval "$(register-python-argcomplete3 ros2)"
+    eval "$(register-python-argcomplete3 colcon)"
+
+    ID=$1
+    if [ $ID -eq 0 ]; then
+      export ROS_LOCALHOST_ONLY=1
+    else
+      export ROS_DOMAIN_ID=$ID
+    fi
   fi
+
   sws=(`ls -1 $SCRIPT_DIR/ros2/`)
   for sw_name in "${sws[@]}"; do
     source $SCRIPT_DIR/ros2/${sw_name}/install/setup.zsh --extended
   done
 
-  # argcomplete for ros2 & colcon
-  eval "$(register-python-argcomplete3 ros2)"
-  eval "$(register-python-argcomplete3 colcon)"
-
   cd $SCRIPT_DIR/ros2
+}
+
+
+if [[ "$MODE" == "ros1" ]]; then
+  source_ros1
+elif [[ "$MODE" == "ros2" ]]; then
+  source_ros2 0
 fi
 
 function swros() {

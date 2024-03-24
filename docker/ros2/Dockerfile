@@ -1,11 +1,11 @@
 FROM osrf/ros:humble-desktop-full
 
-ENV WS_DIR="/root/ros2_ws"
+# ENV WS_DIR="/root/ros2_ws"
 SHELL ["/bin/bash", "-c"]
 
 RUN sed -i.bak -e "s%http://archive.ubuntu.com/ubuntu/%http://ftp.jaist.ac.jp/pub/Linux/ubuntu/%g" /etc/apt/sources.list
-RUN apt-get update && apt-get upgrade -y && apt-get install -y git nano zsh terminator && rosdep update
-RUN mkdir -p $WS_DIR/src
+RUN apt-get update && apt-get upgrade -y && apt-get install -y git nano zsh terminator python3-argcomplete && rosdep update
+# RUN mkdir -p $WS_DIR/src
 
 #WORKDIR  $CATKIN_WS/src
 #RUN git clone https://github.com/Automation-Research-Team/OpenHRC.git
