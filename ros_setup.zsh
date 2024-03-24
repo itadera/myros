@@ -56,20 +56,20 @@ function swros() {
   source ~/.zshrc
 }
 
-alias rd_run="sh $SCRIPT_DIR/docker/$MODE/run.sh"
-alias rd_build="sh $SCRIPT_DIR/docker/$MODE/build.sh"
-alias rd_exec="sh $SCRIPT_DIR/docker/$MODE/exec.sh"
+alias rd_run="bash $SCRIPT_DIR/docker/run.sh"
+alias rd_build="bash $SCRIPT_DIR/docker/build.sh"
+alias rd_exec="bash $SCRIPT_DIR/docker/exec.sh"
 
 function myros() {
   if [[ "$1" == "sw" ]]; then
     swros $2
   elif [[ "$1" == "docker" ]]; then
     if [[ "$2" == "run" ]]; then
-      rd_run
+      rd_run $MODE
     elif [[ "$2" == "build" ]]; then
-      rd_build
+      rd_build $MODE
     elif [[ "$2" == "exec" ]]; then
-      rd_exec
+      rd_exec $MODE
     else
       echo "run, build or exec?"
       return
@@ -95,13 +95,13 @@ function _myros () {
 
   case "$state" in
     arg1)
-      _values $state $val
+      _values 'command' $val
       ;;
     arg2)
       if [[ $words[2] == "sw" ]]; then
-        _values $state $val_sw
+        _values 'ROS version' $val_sw
       elif [[ $words[2] == "docker" ]]; then
-        _values $state $val_docker
+        _values 'Docker command' $val_docker
       fi
       ;;
   esac
