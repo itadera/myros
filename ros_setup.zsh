@@ -2,15 +2,15 @@ DIST_ros1="noetic"
 DIST_ros2="humble"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
-MODE_FILE=".ros2_mode"
+ROSMODE_FILE=".ros2_mode"
 
-if [ -f $SCRIPT_DIR/$MODE_FILE ]; then
-  MODE="ros2"
+if [ -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
+  ROSMODE="ros2"
 else
-  MODE="ros1"
+  ROSMODE="ros1"
 fi
 
-echo "Current ROS version is $MODE"
+# echo "Current ROS version is $ROSMODE"
 
 
 function source_ros1() {
@@ -52,22 +52,22 @@ function source_ros2() {
 }
 
 
-if [[ "$MODE" == "ros1" ]]; then
+if [[ "$ROSMODE" == "ros1" ]]; then
   source_ros1
-elif [[ "$MODE" == "ros2" ]]; then
+elif [[ "$ROSMODE" == "ros2" ]]; then
   source_ros2 0
 fi
 
 function swros() {
   if [[ "$1" == "ros1" ]]; then
-    if [ -f $SCRIPT_DIR/$MODE_FILE ]; then
-      command rm $SCRIPT_DIR/$MODE_FILE
-      MODE=$1
+    if [ -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
+      command rm $SCRIPT_DIR/$ROSMODE_FILE
+      ROSMODE=$1
     fi
   elif [[ "$1" == "ros2" ]]; then
-    if [ ! -f $SCRIPT_DIR/$MODE_FILE ]; then
-      command echo -n > $SCRIPT_DIR/$MODE_FILE
-      MODE=$1
+    if [ ! -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
+      command echo -n > $SCRIPT_DIR/$ROSMODE_FILE
+      ROSMODE=$1
     fi
   else
     echo "ros1 or ros2?"
@@ -85,17 +85,17 @@ function myros() {
     swros $2
   elif [[ "$1" == "docker" ]]; then
     if [[ "$2" == "run" ]]; then
-      rd_run $MODE
+      rd_run $ROSMODE
     elif [[ "$2" == "build" ]]; then
-      rd_build $MODE
+      rd_build $ROSMODE
     elif [[ "$2" == "exec" ]]; then
-      rd_exec $MODE
+      rd_exec $ROSMODE
     else
       echo "run, build or exec?"
       return
     fi
   else
-    echo "Current ROS version is $MODE"
+    echo "Current ROS version is $ROSMODE"
     echo "sw or docker?"
     return
   fi
