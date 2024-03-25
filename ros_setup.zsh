@@ -18,12 +18,13 @@ function source_ros1() {
     source /opt/ros/$DIST_ros1/setup.zsh
   fi
 
+  CATKIN_SETUP_UTIL_ARGS=--extend
   sws=(`ls -1 $SCRIPT_DIR/ros1/`)
   for sw_name in "${sws[@]}"; do
-    source $SCRIPT_DIR/ros1/${sw_name}/devel/setup.zsh --extended
+    source $SCRIPT_DIR/ros1/${sw_name}/devel/setup.zsh
   done
 
-  cd $SCRIPT_DIR/ros1
+  # cd $SCRIPT_DIR/ros1
 }
 
 function source_ros2() {
@@ -47,7 +48,7 @@ function source_ros2() {
     source $SCRIPT_DIR/ros2/${sw_name}/install/setup.zsh --extended
   done
 
-  cd $SCRIPT_DIR/ros2
+  # cd $SCRIPT_DIR/ros2
 }
 
 
@@ -128,4 +129,3 @@ function _myros () {
 
 compdef _myros myros
 
-# zstyle ':completion:*' format '%B%d%b'
