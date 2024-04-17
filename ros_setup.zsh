@@ -94,16 +94,17 @@ function myros() {
       echo "run, build or exec?"
       return
     fi
+  elif [[ "$1" == "cd" ]]; then
+    cd $SCRIPT_DIR/$ROSMODE/"$2"
   else
     echo "Current ROS version is $ROSMODE"
-    echo "sw or docker?"
     return
   fi
 }
 
 function _myros () {
   local -a val
-  val=(sw docker)
+  val=(sw docker cd)
 
   local -a val_sw
   val_sw=(ros1 ros2)
@@ -122,10 +123,11 @@ function _myros () {
         _values 'ROS version' $val_sw
       elif [[ $words[2] == "docker" ]]; then
         _values 'Docker command' $val_docker
+      elif [[ $words[2] == "cd" ]]; then
+        _files -W $SCRIPT_DIR/$ROSMODE
       fi
       ;;
   esac
 }
 
 compdef _myros myros
-
