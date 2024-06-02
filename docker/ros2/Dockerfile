@@ -4,7 +4,7 @@ FROM ros:humble
 SHELL ["/bin/bash", "-c"]
 
 RUN sed -i.bak -e "s%http://archive.ubuntu.com/ubuntu/%http://ftp.jaist.ac.jp/pub/Linux/ubuntu/%g" /etc/apt/sources.list
-RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y git nano zsh terminator python3-argcomplete && rosdep update
+RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y git nano zsh terminator python3-argcomplete openssh-server && rosdep update
 RUN apt-get install --no-install-recommends -y ros-$ROS_DISTRO-plotjuggler-ros
 # RUN mkdir -p $WS_DIR/src
 
