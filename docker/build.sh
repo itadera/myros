@@ -16,6 +16,7 @@ abs_dirname() {
 
 SCRIPT_DIR="$(abs_dirname "$0")"
 MODE=$1
+cd $SCRIPT_DIR/..
 
 if [[ $MODE == "ros1" ]]; then
   IMAGE_NAME="mynoetic"
