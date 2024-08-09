@@ -1,4 +1,4 @@
-FROM ros:humble
+FROM ros:jazzy-perception
 
 # ENV WS_DIR="/root/ros2_ws"
 SHELL ["/bin/bash", "-c"]

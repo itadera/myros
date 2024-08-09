@@ -1,76 +1,80 @@
 DIST_ros1="noetic"
-DIST_ros2="humble"
+DIST_ros2="jazzy"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 ROSMODE_FILE=".ros2_mode"
 
-if [ -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
-  ROSMODE="ros2"
+if [ -f "$SCRIPT_DIR/$ROSMODE_FILE" ]; then
+  ROSMODE=$(cat "$SCRIPT_DIR/$ROSMODE_FILE")
 else
-  ROSMODE="ros1"
+  ROSMODE="noetic"
 fi
-
 # echo "Current ROS version is $ROSMODE"
 
 
 function source_ros1() {
-  if [ -e /opt/ros/$DIST_ros1/setup.zsh ]; then
-    source /opt/ros/$DIST_ros1/setup.zsh
+  if [ -e /opt/ros/$ROSMODE/setup.zsh ]; then
+    source /opt/ros/$ROSMODE/setup.zsh
   fi
 
   CATKIN_SETUP_UTIL_ARGS=--extend
-  sws=(`ls -1 $SCRIPT_DIR/ros1/`)
+  sws=(`ls -1 $SCRIPT_DIR/src/$ROSMODE/`)
   for sw_name in "${sws[@]}"; do
-    source $SCRIPT_DIR/ros1/${sw_name}/devel/setup.zsh
+    source $SCRIPT_DIR/src/$ROSMODE/${sw_name}/devel/setup.zsh
   done
-
-  # cd $SCRIPT_DIR/ros1
 }
 
 function source_ros2() {
-  if [ -e /opt/ros/$DIST_ros2/setup.zsh ]; then
-    source /opt/ros/$DIST_ros2/setup.zsh
+  if [ -e /opt/ros/$ROSMODE/setup.zsh ]; then
+    source /opt/ros/$ROSMODE/setup.zsh
 
-    # argcomplete for ros2 & colcon
-    eval "$(register-python-argcomplete3 ros2)"
-    eval "$(register-python-argcomplete3 colcon)"
+    if [[ "$ROSMODE" == "humble" ]]; then
+       # argcomplete for ros2 & colcon
+      eval "$(register-python-argcomplete3 ros2)"
+      eval "$(register-python-argcomplete3 colcon)"
+
+    fi
 
     ID=$1
     if [ $ID -eq 0 ]; then
-      export ROS_LOCALHOST_ONLY=1
+      if [[ "$ROSMODE" == "humble" ]]; then
+        export ROS_LOCALHOST_ONLY=1
+      else
+        export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+      fi
     else
       export ROS_DOMAIN_ID=$ID
     fi
+        
   fi
 
-  sws=(`ls -1 $SCRIPT_DIR/ros2/`)
+  sws=(`ls -1 $SCRIPT_DIR/src/$ROSMODE/`)
   for sw_name in "${sws[@]}"; do
-    source $SCRIPT_DIR/ros2/${sw_name}/install/setup.zsh --extended
+    source $SCRIPT_DIR/src/$ROSMODE/${sw_name}/install/setup.zsh --extended
   done
 
   # cd $SCRIPT_DIR/ros2
 }
 
-
-if [[ "$ROSMODE" == "ros1" ]]; then
+if [[ "$ROSMODE" == "noetic" ]]; then
   source_ros1
-elif [[ "$ROSMODE" == "ros2" ]]; then
+else
   source_ros2 0
 fi
 
 function swros() {
-  if [[ "$1" == "ros1" ]]; then
+  if [[ "$1" == "noetic" ]]; then
     if [ -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
       command rm $SCRIPT_DIR/$ROSMODE_FILE
       ROSMODE=$1
     fi
-  elif [[ "$1" == "ros2" ]]; then
+  elif [[ "$1" == "humble" || "$1" == "jazzy" ]]; then
     if [ ! -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
-      command echo -n > $SCRIPT_DIR/$ROSMODE_FILE
+      command echo "$1" > $SCRIPT_DIR/$ROSMODE_FILE
       ROSMODE=$1
     fi
   else
-    echo "ros1 or ros2?"
+    echo "noetic or humble or jazzy?"
     return
   fi
   source ~/.zshrc
@@ -95,7 +99,7 @@ function myros() {
       return
     fi
   elif [[ "$1" == "cd" ]]; then
-    cd $SCRIPT_DIR/$ROSMODE/"$2"
+    cd $SCRIPT_DIR/src/$ROSMODE/"$2"
   else
     echo "Current ROS version is $ROSMODE"
     return
@@ -107,7 +111,7 @@ function _myros () {
   val=(sw docker cd)
 
   local -a val_sw
-  val_sw=(ros1 ros2)
+  val_sw=(noetic humble jazzy)
 
   local -a val_docker
   val_docker=(run build exec)
@@ -124,7 +128,7 @@ function _myros () {
       elif [[ $words[2] == "docker" ]]; then
         _values 'Docker command' $val_docker
       elif [[ $words[2] == "cd" ]]; then
-        _files -W $SCRIPT_DIR/$ROSMODE
+        _files -W $SCRIPT_DIR/src/$ROSMODE
       fi
       ;;
   esac
