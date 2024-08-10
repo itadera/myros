@@ -1,5 +1,3 @@
-DIST_ros1="noetic"
-DIST_ros2="jazzy"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 ROSMODE_FILE=".ros2_mode"
@@ -63,16 +61,16 @@ else
 fi
 
 function swros() {
-  if [[ "$1" == "noetic" ]]; then
-    if [ -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
+  if [ -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
       command rm $SCRIPT_DIR/$ROSMODE_FILE
-      ROSMODE=$1
-    fi
+  fi
+
+  if [[ "$1" == "noetic" ]]; then
+    ;
   elif [[ "$1" == "humble" || "$1" == "jazzy" ]]; then
-    if [ ! -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
-      command echo "$1" > $SCRIPT_DIR/$ROSMODE_FILE
-      ROSMODE=$1
-    fi
+
+    command echo "$1" > $SCRIPT_DIR/$ROSMODE_FILE
+    ROSMODE=$1
   else
     echo "noetic or humble or jazzy?"
     return
@@ -85,7 +83,7 @@ alias rd_build="bash $SCRIPT_DIR/docker/build.sh"
 alias rd_exec="bash $SCRIPT_DIR/docker/exec.sh"
 
 function myros() {
-  if [[ "$1" == "sw" ]]; then
+  if [[ "$1" == "switch" ]]; then
     swros $2
   elif [[ "$1" == "docker" ]]; then
     if [[ "$2" == "run" ]]; then
@@ -108,7 +106,7 @@ function myros() {
 
 function _myros () {
   local -a val
-  val=(sw docker cd)
+  val=(switch docker cd)
 
   local -a val_sw
   val_sw=(noetic humble jazzy)
@@ -123,8 +121,8 @@ function _myros () {
       _values 'command' $val
       ;;
     arg2)
-      if [[ $words[2] == "sw" ]]; then
-        _values 'ROS version' $val_sw
+      if [[ $words[2] == "switch" ]]; then
+        _values 'ROS distribution' $val_sw
       elif [[ $words[2] == "docker" ]]; then
         _values 'Docker command' $val_docker
       elif [[ $words[2] == "cd" ]]; then
@@ -135,3 +133,5 @@ function _myros () {
 }
 
 compdef _myros myros
+
+autoload -U compinit; compinit -d

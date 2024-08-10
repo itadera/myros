@@ -1,8 +1,35 @@
 # myros
 
-My settings for ROS development.
+My settings for ROS development installed on native system or docker.
+
+## Usage
+
+Create your workspace in `myros/src/[noetic|humble|jazzy]`.
+
+
+### Change current ROS distribution
+```bash
+$ myros switch [noetic|humble|jazzy]
+```
+
+### Docker operation
+```bash
+$ myros docker [build|run|exec]
+```
+
+### CD
+``` bash
+$ myros cd ...
+```
+
+
+
 
 ## Setup
+0. (Optional) Install terminator
+```bash
+$ sudo apt install terminator
+```
 
 1. Install zsh
 
@@ -26,6 +53,5 @@ $ ./setup.sh
 ```
 
 4. Reopen your terminal
-
 Then, you should be able to use ```myros``` command.
 
