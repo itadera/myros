@@ -31,6 +31,10 @@ function source_ros2() {
       eval "$(register-python-argcomplete3 ros2)"
       eval "$(register-python-argcomplete3 colcon)"
 
+    # elif [[ "$ROSMODE" == "jazzy" ]]; then
+    #   eval "$(register-python-argcomplete ros2)"
+    #   eval "$(register-python-argcomplete colcon)"
+
     fi
 
     ID=$1
@@ -133,5 +137,3 @@ function _myros () {
 }
 
 compdef _myros myros
-
-autoload -U compinit; compinit -d
