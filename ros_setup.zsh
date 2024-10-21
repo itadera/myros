@@ -26,16 +26,7 @@ function source_ros2() {
   if [ -e /opt/ros/$ROSMODE/setup.zsh ]; then
     source /opt/ros/$ROSMODE/setup.zsh
 
-    if [[ "$ROSMODE" == "humble" ]]; then
-       # argcomplete for ros2 & colcon
-      eval "$(register-python-argcomplete3 ros2)"
-      eval "$(register-python-argcomplete3 colcon)"
 
-    # elif [[ "$ROSMODE" == "jazzy" ]]; then
-    #   eval "$(register-python-argcomplete ros2)"
-    #   eval "$(register-python-argcomplete colcon)"
-
-    fi
 
     ID=$1
     if [ $ID -eq 0 ]; then
@@ -54,6 +45,17 @@ function source_ros2() {
   for sw_name in "${sws[@]}"; do
     source $SCRIPT_DIR/src/$ROSMODE/${sw_name}/install/setup.zsh --extended
   done
+  
+  if [[ "$ROSMODE" == "humble" ]]; then
+       # argcomplete for ros2 & colcon
+      eval "$(register-python-argcomplete3 ros2)"
+      eval "$(register-python-argcomplete3 colcon)"
+
+    # elif [[ "$ROSMODE" == "jazzy" ]]; then
+    #   eval "$(register-python-argcomplete ros2)"
+    #   eval "$(register-python-argcomplete colcon)"
+
+  fi
 
   # cd $SCRIPT_DIR/ros2
 }
