@@ -105,6 +105,7 @@ function myros() {
   elif [[ "$1" == "cd" ]]; then
     cd $SCRIPT_DIR/src/$ROSMODE/"$2"
   else
+    source ~/.zshrc
     echo "Current ROS version is $ROSMODE"
     return
   fi
