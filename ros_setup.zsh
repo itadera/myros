@@ -56,6 +56,7 @@ function source_ros2() {
     #   eval "$(register-python-argcomplete colcon)"
 
   fi
+  export RCUTILS_COLORIZED_OUTPUT=1
 
   # cd $SCRIPT_DIR/ros2
 }
