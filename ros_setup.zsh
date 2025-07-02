@@ -1,14 +1,26 @@
+alias rd_run="bash $SCRIPT_DIR/docker/run.sh"
+alias rd_build="bash $SCRIPT_DIR/docker/build.sh"
+alias rd_exec="bash $SCRIPT_DIR/docker/exec.sh"
 
-SCRIPT_DIR=$(cd $(dirname $0); pwd)
-ROSMODE_FILE=".ros2_mode"
+function ros_setup(){
+  SCRIPT_DIR=$(cd $(dirname $0); pwd)
+  ROSMODE_FILE=".ros2_mode"
 
-if [ -f "$SCRIPT_DIR/$ROSMODE_FILE" ]; then
-  ROSMODE=$(cat "$SCRIPT_DIR/$ROSMODE_FILE")
-else
-  ROSMODE="noetic"
-fi
-# echo "Current ROS version is $ROSMODE"
+  if [ -f "$SCRIPT_DIR/$ROSMODE_FILE" ]; then
+    ROSMODE=$(cat -n 1p "$SCRIPT_DIR/$ROSMODE_FILE")
+    DOMAIN_ID=$(cat -n 2p "$SCRIPT_DIR/$ROSMODE_FILE")
+  else
+    ROSMODE="noetic"
+    DOMAIN_ID=0
+  fi
+  # echo "Current ROS version is $ROSMODE"
 
+  if [[ "$ROSMODE" == "noetic" ]]; then
+    source_ros1
+  else
+    source_ros2
+  fi
+}
 
 function source_ros1() {
   if [ -e /opt/ros/$ROSMODE/setup.zsh ]; then
@@ -26,24 +38,21 @@ function source_ros2() {
   if [ -e /opt/ros/$ROSMODE/setup.zsh ]; then
     source /opt/ros/$ROSMODE/setup.zsh
 
-
-
-    ID=$1
-    if [ $ID -eq 0 ]; then
+    if [ $DOMAIN_ID -eq 0 ]; then
       if [[ "$ROSMODE" == "humble" ]]; then
         export ROS_LOCALHOST_ONLY=1
       else
         export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
       fi
     else
-      export ROS_DOMAIN_ID=$ID
+      export ROS_DOMAIN_ID=$DOMAIN_ID
     fi
         
   fi
 
   sws=(`ls -1 $SCRIPT_DIR/src/$ROSMODE/`)
   for sw_name in "${sws[@]}"; do
-    source $SCRIPT_DIR/src/$ROSMODE/${sw_name}/install/setup.zsh --extended
+    source $SCRIPT_DIR/src/$ROSMODE/${sw_name}/install/local_setup.zsh --extended
   done
   
   if [[ "$ROSMODE" == "humble" ]]; then
@@ -61,11 +70,7 @@ function source_ros2() {
   # cd $SCRIPT_DIR/ros2
 }
 
-if [[ "$ROSMODE" == "noetic" ]]; then
-  source_ros1
-else
-  source_ros2 0
-fi
+
 
 function swros() {
   if [ -f $SCRIPT_DIR/$ROSMODE_FILE ]; then
@@ -77,6 +82,7 @@ function swros() {
   elif [[ "$1" == "humble" || "$1" == "jazzy" ]]; then
 
     command echo "$1" > $SCRIPT_DIR/$ROSMODE_FILE
+    command echo "$DOMAIN_ID" >> $SCRIPT_DIR/$ROSMODE_FILE
     ROSMODE=$1
   else
     echo "noetic or humble or jazzy?"
@@ -85,9 +91,26 @@ function swros() {
   source ~/.zshrc
 }
 
-alias rd_run="bash $SCRIPT_DIR/docker/run.sh"
-alias rd_build="bash $SCRIPT_DIR/docker/build.sh"
-alias rd_exec="bash $SCRIPT_DIR/docker/exec.sh"
+function rd_setid() {
+  if [[ "$1" == "0" ]]; then
+    if [[ "$ROSMODE" == "humble" ]]; then
+      export ROS_LOCALHOST_ONLY=1
+    else
+      export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+    fi
+    echo "ROS_DOMAIN_ID is set to 0 (localhost only)"
+  else
+    if [[ "$ROSMODE" == "humble" ]]; then
+      export ROS_LOCALHOST_ONLY=0
+    else
+      export ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET
+    fi
+    export ROS_DOMAIN_ID=$1
+    echo "ROS_DOMAIN_ID is set to $ROS_DOMAIN_ID"
+  fi
+}
+
+
 
 function myros() {
   if [[ "$1" == "switch" ]]; then
@@ -99,6 +122,8 @@ function myros() {
       rd_build $ROSMODE
     elif [[ "$2" == "exec" ]]; then
       rd_exec $ROSMODE
+    elif [[ "$2" == "setid" ]]; then
+      rd_setid $ROSMODE
     else
       echo "run, build or exec?"
       return
@@ -114,7 +139,7 @@ function myros() {
 
 function _myros () {
   local -a val
-  val=(switch docker cd)
+  val=(switch docker cd setid)
 
   local -a val_sw
   val_sw=(noetic humble jazzy)
@@ -141,3 +166,6 @@ function _myros () {
 }
 
 compdef _myros myros
+
+
+ros_setup()
