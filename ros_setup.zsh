@@ -1,14 +1,15 @@
 alias rd_run="bash $SCRIPT_DIR/docker/run.sh"
 alias rd_build="bash $SCRIPT_DIR/docker/build.sh"
 alias rd_exec="bash $SCRIPT_DIR/docker/exec.sh"
+SCRIPT_DIR=$(cd $(dirname $0); pwd)
+ROSMODE_FILE=".ros2_mode"
 
-function ros_setup(){
-  SCRIPT_DIR=$(cd $(dirname $0); pwd)
-  ROSMODE_FILE=".ros2_mode"
+function ros_setup() {
+
 
   if [ -f "$SCRIPT_DIR/$ROSMODE_FILE" ]; then
-    ROSMODE=$(cat -n 1p "$SCRIPT_DIR/$ROSMODE_FILE")
-    DOMAIN_ID=$(cat -n 2p "$SCRIPT_DIR/$ROSMODE_FILE")
+    ROSMODE=$(sed -n 1p "$SCRIPT_DIR/$ROSMODE_FILE")
+    DOMAIN_ID=$(sed -n 2p "$SCRIPT_DIR/$ROSMODE_FILE")
   else
     ROSMODE="noetic"
     DOMAIN_ID=0
@@ -38,15 +39,20 @@ function source_ros2() {
   if [ -e /opt/ros/$ROSMODE/setup.zsh ]; then
     source /opt/ros/$ROSMODE/setup.zsh
 
-    if [ $DOMAIN_ID -eq 0 ]; then
+    if [[ $DOMAIN_ID -eq 0 ]]; then
       if [[ "$ROSMODE" == "humble" ]]; then
         export ROS_LOCALHOST_ONLY=1
       else
         export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
       fi
     else
-      export ROS_DOMAIN_ID=$DOMAIN_ID
+      if [[ "$ROSMODE" == "humble" ]]; then
+        export ROS_LOCALHOST_ONLY=0
+      else
+        export ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET
+      fi
     fi
+    export ROS_DOMAIN_ID=$DOMAIN_ID
         
   fi
 
@@ -91,23 +97,12 @@ function swros() {
   source ~/.zshrc
 }
 
-function rd_setid() {
-  if [[ "$1" == "0" ]]; then
-    if [[ "$ROSMODE" == "humble" ]]; then
-      export ROS_LOCALHOST_ONLY=1
-    else
-      export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
-    fi
-    echo "ROS_DOMAIN_ID is set to 0 (localhost only)"
-  else
-    if [[ "$ROSMODE" == "humble" ]]; then
-      export ROS_LOCALHOST_ONLY=0
-    else
-      export ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET
-    fi
-    export ROS_DOMAIN_ID=$1
-    echo "ROS_DOMAIN_ID is set to $ROS_DOMAIN_ID"
-  fi
+function setid() {
+  command sed -i '2d' $SCRIPT_DIR/$ROSMODE_FILE
+  echo $1 >> $SCRIPT_DIR/$ROSMODE_FILE
+
+  DOMAIN_ID=$1
+  source_ros2
 }
 
 
@@ -122,14 +117,14 @@ function myros() {
       rd_build $ROSMODE
     elif [[ "$2" == "exec" ]]; then
       rd_exec $ROSMODE
-    elif [[ "$2" == "setid" ]]; then
-      rd_setid $ROSMODE
     else
-      echo "run, build or exec?"
+      echo "run, build, exec?"
       return
     fi
   elif [[ "$1" == "cd" ]]; then
     cd $SCRIPT_DIR/src/$ROSMODE/"$2"
+  elif [[ "$1" == "setid" ]]; then
+    setid $2
   else
     source ~/.zshrc
     echo "Current ROS version is $ROSMODE"
@@ -168,4 +163,4 @@ function _myros () {
 compdef _myros myros
 
 
-ros_setup()
+ros_setup

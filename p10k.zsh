@@ -1670,7 +1670,7 @@
   }
 
   function prompt_my_rosmode() {
-    p10k segment -f 158 -i '🤖' -t "${ROSMODE}"
+    p10k segment -f 158 -i '🤖' -t "${ROSMODE}[${ROS_DOMAIN_ID}]"
   }
 
 
