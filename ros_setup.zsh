@@ -63,8 +63,10 @@ function source_ros2() {
   
   if [[ "$ROSMODE" == "humble" ]]; then
        # argcomplete for ros2 & colcon
-      eval "$(register-python-argcomplete3 ros2)"
-      eval "$(register-python-argcomplete3 colcon)"
+       if [ -e /opt/ros/$ROSMODE/setup.zsh ]; then
+          eval "$(register-python-argcomplete3 ros2)"
+          eval "$(register-python-argcomplete3 colcon)"
+       fi
 
     # elif [[ "$ROSMODE" == "jazzy" ]]; then
     #   eval "$(register-python-argcomplete ros2)"
