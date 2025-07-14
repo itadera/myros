@@ -49,7 +49,7 @@ After installing prezto and p10k and run zsh, you should see the p10k configurat
 ```bash
 $ git clone https://github.com/itadera/myros.git
 $ cd myros
-$ ./setup.sh
+$ sudo bash setup.sh
 ```
 
 4. Reopen your terminal
